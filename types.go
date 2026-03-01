@@ -1,0 +1,184 @@
+// Package table provides reusable templ-based table, pagination, sorting,
+// and filter components for Go web applications using HTMX + Alpine.js + Tailwind CSS.
+package table
+
+import (
+	"fmt"
+	"net/url"
+	"strconv"
+)
+
+// ---------------------------------------------------------------------------
+// Core props
+// ---------------------------------------------------------------------------
+
+// DataTableProps configures the server-side table.
+type DataTableProps struct {
+	ID         string // HTML id for the <table> element (default: "data-table")
+	SortBy     string // Current sort field
+	SortDir    string // "asc" or "desc"
+	BaseURL    string // Base URL for sort/page links
+	Page       int    // Current page (1-based)
+	PageSize   int    // Items per page
+	TotalPages int    // Total number of pages
+	TotalItems int    // Total records
+}
+
+// TableID returns the HTML id, defaulting to "data-table".
+func (p DataTableProps) TableID() string {
+	if p.ID != "" {
+		return p.ID
+	}
+	return "data-table"
+}
+
+// PaginationProps for the pagination bar.
+type PaginationProps struct {
+	Page       int
+	TotalPages int
+	TotalItems int
+	PageSize   int
+	BaseURL    string
+	PageSizes  []int // e.g. [10, 20, 50, 100]
+}
+
+// SortHeaderProps for sortable column headers.
+type SortHeaderProps struct {
+	Field   string // Field name for sorting
+	Label   string // Display text
+	SortBy  string // Currently active sort field
+	SortDir string // Current sort direction
+	BaseURL string // URL with preserved query params
+}
+
+// BodyProps configures the <tbody> element.
+type BodyProps struct {
+	ID string // HTML id for the <tbody> element
+}
+
+// FilterProps for the filter card.
+type FilterProps struct {
+	Action string // Form action URL
+	Method string // HTTP method (default: GET)
+}
+
+// FilterOption represents a single <option> in a filter select.
+type FilterOption struct {
+	Value string
+	Label string
+}
+
+// ---------------------------------------------------------------------------
+// Action / button props
+// ---------------------------------------------------------------------------
+
+// ActionButtonProps configures a CRUD action button (edit, delete, view, etc.).
+type ActionButtonProps struct {
+	Action  string // "edit", "delete", "view", "copy"
+	URL     string // Target URL or hx-get/hx-delete target
+	Confirm string // Optional confirmation message (for delete)
+}
+
+// NewButtonProps configures the "Add new" button above the table.
+type NewButtonProps struct {
+	Label string // Button text (default: "Add New")
+	URL   string // hx-get target for the create form
+}
+
+// ---------------------------------------------------------------------------
+// Badge props
+// ---------------------------------------------------------------------------
+
+// BadgeVariant controls the color scheme of a StatusBadge.
+type BadgeVariant string
+
+const (
+	BadgeSuccess BadgeVariant = "success"
+	BadgeWarning BadgeVariant = "warning"
+	BadgeDanger  BadgeVariant = "danger"
+	BadgeInfo    BadgeVariant = "info"
+	BadgeNeutral BadgeVariant = "neutral"
+)
+
+// ---------------------------------------------------------------------------
+// Defaults
+// ---------------------------------------------------------------------------
+
+// DefaultPageSizes returns the standard page size options.
+func DefaultPageSizes() []int {
+	return []int{10, 20, 50, 100}
+}
+
+// ---------------------------------------------------------------------------
+// URL helpers
+// ---------------------------------------------------------------------------
+
+// SortURL builds a URL that toggles the sort direction for a given field.
+// If the field is already the active sort, it flips the direction; otherwise
+// it defaults to ascending.
+func SortURL(baseURL, field, currentSort, currentDir string) string {
+	dir := "asc"
+	if field == currentSort && currentDir == "asc" {
+		dir = "desc"
+	}
+	u, err := url.Parse(baseURL)
+	if err != nil {
+		return baseURL
+	}
+	q := u.Query()
+	q.Set("sort_by", field)
+	q.Set("sort_dir", dir)
+	q.Del("page") // reset to page 1 on sort change
+	u.RawQuery = q.Encode()
+	return u.String()
+}
+
+// PageURL builds a URL for a specific page number.
+func PageURL(baseURL string, page int) string {
+	u, err := url.Parse(baseURL)
+	if err != nil {
+		return baseURL
+	}
+	q := u.Query()
+	q.Set("page", strconv.Itoa(page))
+	u.RawQuery = q.Encode()
+	return u.String()
+}
+
+// PageSizeURL builds a URL for changing the page size (resets to page 1).
+func PageSizeURL(baseURL string, size int) string {
+	u, err := url.Parse(baseURL)
+	if err != nil {
+		return baseURL
+	}
+	q := u.Query()
+	q.Set("page_size", strconv.Itoa(size))
+	q.Del("page") // reset to page 1
+	u.RawQuery = q.Encode()
+	return u.String()
+}
+
+// SortIcon returns a Unicode arrow indicating the current sort direction
+// for a field: ▲ (asc), ▼ (desc), or ↕ (not sorted by this field).
+func SortIcon(field, currentSort, currentDir string) string {
+	if field != currentSort {
+		return "↕"
+	}
+	if currentDir == "desc" {
+		return "▼"
+	}
+	return "▲"
+}
+
+// PaginationInfo returns a human-readable string like "Showing 1–10 of 42 items".
+func PaginationInfo(page, pageSize, totalItems int) string {
+	if totalItems == 0 {
+		return "No items"
+	}
+	start := (page-1)*pageSize + 1
+	end := page * pageSize
+	if end > totalItems {
+		end = totalItems
+	}
+	return fmt.Sprintf("Showing %d\u2013%d of %d items", start, end, totalItems)
+}

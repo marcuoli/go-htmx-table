@@ -1,0 +1,58 @@
+package table
+
+// FilterCard renders a filter/search card above a table.
+templ FilterCard(action string) {
+	<div class="p-4 mb-4 bg-white border border-gray-200 shadow-sm rounded-xl dark:bg-gray-800 dark:border-gray-700">
+		<form
+			action={ templ.SafeURL(action) }
+			method="GET"
+			hx-get={ action }
+			hx-target="closest div.overflow-x-auto"
+			hx-swap="outerHTML"
+			hx-trigger="input changed delay:300ms, change"
+			class="flex flex-wrap items-end gap-4"
+		>
+			{ children... }
+		</form>
+	</div>
+}
+
+// SearchInput renders a debounced search input field.
+templ SearchInput(name, placeholder, value string) {
+	<div class="flex-1 min-w-[200px]">
+		<label class="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-300">
+			Search
+		</label>
+		<input
+			type="search"
+			name={ name }
+			placeholder={ placeholder }
+			value={ value }
+			class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:focus:ring-blue-400"
+		/>
+	</div>
+}
+
+// FilterSelect renders a dropdown filter field.
+templ FilterSelect(name, label, selected string, options []FilterOption) {
+	<div class="min-w-[150px]">
+		<label class="block mb-1 text-sm font-medium text-gray-700 dark:text-gray-300">
+			{ label }
+		</label>
+		<select
+			name={ name }
+			class="w-full px-3 py-2 border border-gray-300 rounded-lg dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+		>
+			for _, opt := range options {
+				<option
+					value={ opt.Value }
+					if opt.Value == selected {
+						selected
+					}
+				>
+					{ opt.Label }
+				</option>
+			}
+		</select>
+	</div>
+}
