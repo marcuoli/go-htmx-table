@@ -32,7 +32,7 @@ func ServerPagination(props PaginationProps) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"flex items-center justify-between px-4 py-3 bg-white border-t border-gray-200 dark:bg-gray-900 dark:border-gray-700 sm:px-6\"><div class=\"text-sm text-gray-700 dark:text-gray-300\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"flex items-center justify-between px-3 py-2 bg-white border-t border-gray-200 dark:bg-gray-900 dark:border-gray-700 sm:px-4\"><div class=\"text-xs text-gray-700 dark:text-gray-300\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
