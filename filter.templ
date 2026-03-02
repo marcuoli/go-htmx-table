@@ -1,15 +1,17 @@
 package table
 
 // FilterCard renders a filter/search card above a table.
-templ FilterCard(action string) {
-	<div class="p-4 mb-4 bg-white border border-gray-200 shadow-sm rounded-xl dark:bg-gray-800 dark:border-gray-700">
+templ FilterCard(props FilterCardProps) {
+	<div class="p-4 bg-white border border-gray-200 shadow-sm rounded-lg dark:bg-gray-800 dark:border-gray-700">
 		<form
-			action={ templ.SafeURL(action) }
+			action={ templ.SafeURL(props.Action) }
 			method="GET"
-			hx-get={ action }
-			hx-target="closest div.overflow-x-auto"
-			hx-swap="outerHTML"
-			hx-trigger="input changed delay:300ms, change"
+			hx-get={ props.Action }
+			hx-target={ props.Target() }
+			if props.HxPushURL {
+				hx-push-url="true"
+			}
+			hx-trigger="input changed delay:300ms, submit"
 			class="flex flex-wrap items-end gap-4"
 		>
 			{ children... }

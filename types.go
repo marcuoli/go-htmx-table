@@ -39,16 +39,36 @@ type PaginationProps struct {
 	TotalItems int
 	PageSize   int
 	BaseURL    string
-	PageSizes  []int // e.g. [10, 20, 50, 100]
+	PageSizes  []int  // e.g. [10, 20, 50, 100]
+	HxTarget   string // HTMX target selector (defaults to "#content")
+	HxPushURL  bool   // Whether to update browser URL on page change
+}
+
+// Target returns the HTMX target, defaulting to "#content".
+func (p PaginationProps) Target() string {
+	if p.HxTarget != "" {
+		return p.HxTarget
+	}
+	return "#content"
 }
 
 // SortHeaderProps for sortable column headers.
 type SortHeaderProps struct {
-	Field   string // Field name for sorting
-	Label   string // Display text
-	SortBy  string // Currently active sort field
-	SortDir string // Current sort direction
-	BaseURL string // URL with preserved query params
+	Field     string // Field name for sorting
+	Label     string // Display text
+	SortBy    string // Currently active sort field
+	SortDir   string // Current sort direction
+	BaseURL   string // URL with preserved query params
+	HxTarget  string // HTMX target selector (defaults to "#content")
+	HxPushURL bool   // Whether to update browser URL on sort
+}
+
+// Target returns the HTMX target, defaulting to "#content".
+func (p SortHeaderProps) Target() string {
+	if p.HxTarget != "" {
+		return p.HxTarget
+	}
+	return "#content"
 }
 
 // BodyProps configures the <tbody> element.
@@ -66,6 +86,21 @@ type FilterProps struct {
 type FilterOption struct {
 	Value string
 	Label string
+}
+
+// FilterCardProps configures the filter/search card above a table.
+type FilterCardProps struct {
+	Action    string // Form action URL (also hx-get target)
+	HxTarget  string // HTMX target selector (defaults to "#content")
+	HxPushURL bool   // Whether to update browser URL on filter change
+}
+
+// Target returns the HTMX target, defaulting to "#content".
+func (p FilterCardProps) Target() string {
+	if p.HxTarget != "" {
+		return p.HxTarget
+	}
+	return "#content"
 }
 
 // ---------------------------------------------------------------------------
