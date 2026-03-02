@@ -13,13 +13,13 @@ templ ServerPagination(props PaginationProps) {
 		<div class="flex items-center gap-1">
 			// First page
 			if props.Page > 1 {
-				@pageButton(props.BaseURL, 1, "«", false)
+				@pageButton(props.BaseURL, 1, "«", false, props.Target(), props.HxPushURL)
 			} else {
 				@pageButtonDisabled("«")
 			}
 			// Previous
 			if props.Page > 1 {
-				@pageButton(props.BaseURL, props.Page-1, "‹", false)
+				@pageButton(props.BaseURL, props.Page-1, "‹", false, props.Target(), props.HxPushURL)
 			} else {
 				@pageButtonDisabled("‹")
 			}
@@ -29,13 +29,13 @@ templ ServerPagination(props PaginationProps) {
 			</span>
 			// Next
 			if props.Page < props.TotalPages {
-				@pageButton(props.BaseURL, props.Page+1, "›", false)
+				@pageButton(props.BaseURL, props.Page+1, "›", false, props.Target(), props.HxPushURL)
 			} else {
 				@pageButtonDisabled("›")
 			}
 			// Last page
 			if props.Page < props.TotalPages {
-				@pageButton(props.BaseURL, props.TotalPages, "»", false)
+				@pageButton(props.BaseURL, props.TotalPages, "»", false, props.Target(), props.HxPushURL)
 			} else {
 				@pageButtonDisabled("»")
 			}
@@ -46,8 +46,10 @@ templ ServerPagination(props PaginationProps) {
 			<select
 				class="text-sm border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300"
 				hx-get={ props.BaseURL }
-				hx-target="closest div.overflow-x-auto"
-				hx-swap="outerHTML"
+				hx-target={ props.Target() }
+				if props.HxPushURL {
+					hx-push-url="true"
+				}
 				name="page_size"
 				hx-include="this"
 			>
@@ -67,12 +69,14 @@ templ ServerPagination(props PaginationProps) {
 }
 
 // pageButton renders a clickable pagination button.
-templ pageButton(baseURL string, page int, label string, active bool) {
+templ pageButton(baseURL string, page int, label string, active bool, hxTarget string, hxPushURL bool) {
 	<a
 		href={ templ.SafeURL(PageURL(baseURL, page)) }
 		hx-get={ PageURL(baseURL, page) }
-		hx-target="closest div.overflow-x-auto"
-		hx-swap="outerHTML"
+		hx-target={ hxTarget }
+		if hxPushURL {
+			hx-push-url="true"
+		}
 		if active {
 			class="relative inline-flex items-center px-3 py-1 text-sm font-medium text-white bg-blue-600 rounded-md dark:bg-blue-500"
 		} else {
