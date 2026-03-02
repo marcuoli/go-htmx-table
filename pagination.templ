@@ -4,9 +4,9 @@ import "strconv"
 
 // ServerPagination renders a pagination bar with First/Prev/Next/Last buttons and page info.
 templ ServerPagination(props PaginationProps) {
-	<div class="flex items-center justify-between px-4 py-3 bg-white border-t border-gray-200 dark:bg-gray-900 dark:border-gray-700 sm:px-6">
+	<div class="flex items-center justify-between px-3 py-2 bg-white border-t border-gray-200 dark:bg-gray-900 dark:border-gray-700 sm:px-4">
 		// Left: pagination info
-		<div class="text-sm text-gray-700 dark:text-gray-300">
+		<div class="text-xs text-gray-700 dark:text-gray-300">
 			{ PaginationInfo(props.Page, props.PageSize, props.TotalItems) }
 		</div>
 		// Center: page buttons
