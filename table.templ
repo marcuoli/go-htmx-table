@@ -27,7 +27,7 @@ templ DataTableBody(props BodyProps) {
 		if props.ID != "" {
 			id={ props.ID }
 		}
-		class="bg-white divide-y divide-gray-200 dark:bg-gray-900 dark:divide-gray-700"
+		class="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700"
 	>
 		{ children... }
 	</tbody>
@@ -35,7 +35,7 @@ templ DataTableBody(props BodyProps) {
 
 // Row renders a table row with hover effect and zebra striping.
 templ Row() {
-	<tr class="even:bg-gray-50/50 dark:even:bg-gray-800/30 hover:bg-gray-100 dark:hover:bg-gray-800/50 transition-colors">
+	<tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
 		{ children... }
 	</tr>
 }

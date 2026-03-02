@@ -1,0 +1,199 @@
+package table
+
+import "strconv"
+
+// List renders filter, table, and pagination in a single call.
+templ List(props ListProps) {
+	<div
+		if props.RefreshURL != "" {
+			hx-get={ props.RefreshURL }
+			hx-trigger={ props.RefreshTrigger }
+			hx-target={ props.Target() }
+		}
+		class={ props.Classes.Wrapper }
+	>
+		if props.SearchEnabled {
+			<div class={ props.Classes.FilterCard }>
+				<form
+					action={ templ.SafeURL(props.BaseURL) }
+					method="GET"
+					hx-get={ props.BaseURL }
+					hx-target={ props.Target() }
+					if props.HxPushURL {
+						hx-push-url="true"
+					}
+					hx-trigger="input changed delay:300ms, submit"
+					class={ props.Classes.FilterForm }
+				>
+					<div class={ props.Classes.SearchWrap }>
+						<input
+							type="search"
+							name={ props.EffectiveSearchName() }
+							placeholder={ props.SearchPlaceholder }
+							value={ props.Search }
+							class={ props.Classes.SearchInput }
+						/>
+					</div>
+				</form>
+			</div>
+		}
+
+		<div class={ props.Classes.TableWrap }>
+			<table id={ props.EffectiveTableID() } class={ props.Classes.Table }>
+				<thead class={ props.Classes.Head }>
+					<tr>
+						for _, col := range props.Columns {
+							if col.Align == "right" {
+								<th scope="col" class={ props.Classes.HeaderCellRight }>
+									if col.Sortable {
+										<a
+											href={ templ.SafeURL(SortURL(props.BaseURL, col.Field, props.SortBy, props.SortDir)) }
+											hx-get={ SortURL(props.BaseURL, col.Field, props.SortBy, props.SortDir) }
+											hx-target={ props.Target() }
+											if props.HxPushURL {
+												hx-push-url="true"
+											}
+											class={ props.Classes.SortLink }
+										>
+											<span>{ col.Label }</span>
+											<span class={ props.Classes.SortIcon }>{ SortIcon(col.Field, props.SortBy, props.SortDir) }</span>
+										</a>
+									} else {
+										{ col.Label }
+									}
+								</th>
+							} else {
+								<th scope="col" class={ props.Classes.HeaderCell }>
+									if col.Sortable {
+										<a
+											href={ templ.SafeURL(SortURL(props.BaseURL, col.Field, props.SortBy, props.SortDir)) }
+											hx-get={ SortURL(props.BaseURL, col.Field, props.SortBy, props.SortDir) }
+											hx-target={ props.Target() }
+											if props.HxPushURL {
+												hx-push-url="true"
+											}
+											class={ props.Classes.SortLink }
+										>
+											<span>{ col.Label }</span>
+											<span class={ props.Classes.SortIcon }>{ SortIcon(col.Field, props.SortBy, props.SortDir) }</span>
+										</a>
+									} else {
+										{ col.Label }
+									}
+								</th>
+							}
+						}
+					</tr>
+				</thead>
+				<tbody
+					if props.BodyID != "" {
+						id={ props.BodyID }
+					}
+					class={ props.Classes.Body }
+				>
+					if props.HasRows {
+						{ children... }
+					} else {
+						<tr>
+							<td colspan={ strconv.Itoa(len(props.Columns)) } class={ props.Classes.EmptyCell }>
+								<div class={ props.Classes.EmptyWrap }>
+									<svg class={ props.Classes.EmptyIcon } fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
+										<path stroke-linecap="round" stroke-linejoin="round" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
+									</svg>
+									<p class={ props.Classes.EmptyText }>{ props.EffectiveEmptyMessage() }</p>
+								</div>
+							</td>
+						</tr>
+					}
+				</tbody>
+			</table>
+		</div>
+
+		if props.TotalPages > 1 {
+			<div class={ props.Classes.Pagination }>
+				<div class={ props.Classes.PaginationInfo }>
+					{ PaginationInfo(props.Page, props.PageSize, props.TotalItems) }
+				</div>
+				<div class={ props.Classes.PaginationNav }>
+					if props.Page > 1 {
+						<a
+							href={ templ.SafeURL(PageURL(props.BaseURL, 1)) }
+							hx-get={ PageURL(props.BaseURL, 1) }
+							hx-target={ props.Target() }
+							if props.HxPushURL {
+								hx-push-url="true"
+							}
+							class={ props.Classes.PageBtn }
+						>«</a>
+					} else {
+						<span class={ props.Classes.PageBtnDisabled }>«</span>
+					}
+					if props.Page > 1 {
+						<a
+							href={ templ.SafeURL(PageURL(props.BaseURL, props.Page-1)) }
+							hx-get={ PageURL(props.BaseURL, props.Page-1) }
+							hx-target={ props.Target() }
+							if props.HxPushURL {
+								hx-push-url="true"
+							}
+							class={ props.Classes.PageBtn }
+						>‹</a>
+					} else {
+						<span class={ props.Classes.PageBtnDisabled }>‹</span>
+					}
+					<span class={ props.Classes.PageIndicator }>{ strconv.Itoa(props.Page) } / { strconv.Itoa(props.TotalPages) }</span>
+					if props.Page < props.TotalPages {
+						<a
+							href={ templ.SafeURL(PageURL(props.BaseURL, props.Page+1)) }
+							hx-get={ PageURL(props.BaseURL, props.Page+1) }
+							hx-target={ props.Target() }
+							if props.HxPushURL {
+								hx-push-url="true"
+							}
+							class={ props.Classes.PageBtn }
+						>›</a>
+					} else {
+						<span class={ props.Classes.PageBtnDisabled }>›</span>
+					}
+					if props.Page < props.TotalPages {
+						<a
+							href={ templ.SafeURL(PageURL(props.BaseURL, props.TotalPages)) }
+							hx-get={ PageURL(props.BaseURL, props.TotalPages) }
+							hx-target={ props.Target() }
+							if props.HxPushURL {
+								hx-push-url="true"
+							}
+							class={ props.Classes.PageBtn }
+						>»</a>
+					} else {
+						<span class={ props.Classes.PageBtnDisabled }>»</span>
+					}
+				</div>
+				<div class={ props.Classes.PageSizeWrap }>
+					<label class={ props.Classes.PageSizeLabel }>Show:</label>
+					<select
+						class={ props.Classes.PageSizeSelect }
+						hx-get={ props.BaseURL }
+						hx-target={ props.Target() }
+						if props.HxPushURL {
+							hx-push-url="true"
+						}
+						name="page_size"
+						hx-include="this"
+					>
+						for _, size := range pageSizes(props.PageSizes) {
+							<option
+								value={ strconv.Itoa(size) }
+								if size == props.PageSize {
+									selected
+								}
+							>
+								{ strconv.Itoa(size) }
+							</option>
+						}
+					</select>
+				</div>
+			</div>
+		}
+	</div>
+}
