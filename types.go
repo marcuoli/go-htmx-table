@@ -121,6 +121,108 @@ type NewButtonProps struct {
 }
 
 // ---------------------------------------------------------------------------
+// Single-call list API
+// ---------------------------------------------------------------------------
+
+// ListColumn defines one table column in the single-call List component.
+type ListColumn struct {
+	Field    string // Field name used for sorting
+	Label    string // Header label
+	Sortable bool   // Whether this column is sortable
+	Align    string // "left" (default) or "right"
+}
+
+// ListClasses defines all CSS classes used by the single-call List component.
+// The client application owns these values and passes them through ListProps.
+type ListClasses struct {
+	FilterCard      string
+	FilterForm      string
+	SearchWrap      string
+	SearchInput     string
+	Wrapper         string
+	TableWrap       string
+	Table           string
+	Head            string
+	HeaderCell      string
+	HeaderCellRight string
+	SortLink        string
+	SortIcon        string
+	Body            string
+	EmptyCell       string
+	EmptyWrap       string
+	EmptyIcon       string
+	EmptyText       string
+	Pagination      string
+	PaginationInfo  string
+	PaginationNav   string
+	PageIndicator   string
+	PageSizeWrap    string
+	PageSizeLabel   string
+	PageSizeSelect  string
+	PageBtn         string
+	PageBtnActive   string
+	PageBtnDisabled string
+}
+
+// ListProps configures the high-level List component.
+type ListProps struct {
+	TableID            string
+	BodyID             string
+	Columns            []ListColumn
+	SortBy             string
+	SortDir            string
+	BaseURL            string
+	Page               int
+	PageSize           int
+	TotalPages         int
+	TotalItems         int
+	PageSizes          []int
+	Search             string
+	SearchName         string
+	SearchPlaceholder  string
+	SearchEnabled      bool
+	HasRows            bool
+	EmptyMessage       string
+	HxTarget           string
+	HxPushURL          bool
+	RefreshTrigger     string
+	RefreshURL         string
+	Classes            ListClasses
+}
+
+// Target returns the HTMX target, defaulting to "#content".
+func (p ListProps) Target() string {
+	if p.HxTarget != "" {
+		return p.HxTarget
+	}
+	return "#content"
+}
+
+// EffectiveSearchName returns the input name for search query.
+func (p ListProps) EffectiveSearchName() string {
+	if p.SearchName != "" {
+		return p.SearchName
+	}
+	return "search"
+}
+
+// EffectiveEmptyMessage returns the empty state message.
+func (p ListProps) EffectiveEmptyMessage() string {
+	if p.EmptyMessage != "" {
+		return p.EmptyMessage
+	}
+	return "No items found"
+}
+
+// EffectiveTableID returns table id with fallback.
+func (p ListProps) EffectiveTableID() string {
+	if p.TableID != "" {
+		return p.TableID
+	}
+	return "data-table"
+}
+
+// ---------------------------------------------------------------------------
 // Badge props
 // ---------------------------------------------------------------------------
 
