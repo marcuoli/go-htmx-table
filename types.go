@@ -112,6 +112,15 @@ type ActionButtonProps struct {
 	Action  string // "edit", "delete", "view", "copy"
 	URL     string // Target URL or hx-get/hx-delete target
 	Confirm string // Optional confirmation message (for delete)
+	Class   string // Optional CSS class from caller app (preferred)
+}
+
+// EffectiveClass returns caller-provided classes or a minimal structural fallback.
+func (p ActionButtonProps) EffectiveClass() string {
+	if p.Class != "" {
+		return p.Class
+	}
+	return "inline-flex items-center"
 }
 
 // NewButtonProps configures the "Add new" button above the table.
