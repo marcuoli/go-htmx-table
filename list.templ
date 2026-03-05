@@ -34,6 +34,13 @@ templ List(props ListProps) {
 							class={ props.Classes.SearchInput }
 						/>
 					</div>
+					if props.SortBy != "" {
+						<input type="hidden" name="sort_by" value={ props.SortBy }/>
+						<input type="hidden" name="sort_dir" value={ props.SortDir }/>
+					}
+					if props.PageSize > 0 {
+						<input type="hidden" name="page_size" value={ strconv.Itoa(props.PageSize) }/>
+					}
 				</form>
 			</div>
 		}
@@ -47,8 +54,8 @@ templ List(props ListProps) {
 								<th scope="col" class={ props.Classes.HeaderCellRight }>
 									if col.Sortable {
 										<a
-											href={ templ.SafeURL(SortURL(props.BaseURL, col.Field, props.SortBy, props.SortDir)) }
-											hx-get={ SortURL(props.BaseURL, col.Field, props.SortBy, props.SortDir) }
+											href={ templ.SafeURL(SortURL(props.StateURL(), col.Field, props.SortBy, props.SortDir)) }
+											hx-get={ SortURL(props.StateURL(), col.Field, props.SortBy, props.SortDir) }
 											hx-target={ props.Target() }
 											if props.HxPushURL {
 												hx-push-url="true"
@@ -66,8 +73,8 @@ templ List(props ListProps) {
 								<th scope="col" class={ props.Classes.HeaderCell }>
 									if col.Sortable {
 										<a
-											href={ templ.SafeURL(SortURL(props.BaseURL, col.Field, props.SortBy, props.SortDir)) }
-											hx-get={ SortURL(props.BaseURL, col.Field, props.SortBy, props.SortDir) }
+											href={ templ.SafeURL(SortURL(props.StateURL(), col.Field, props.SortBy, props.SortDir)) }
+											hx-get={ SortURL(props.StateURL(), col.Field, props.SortBy, props.SortDir) }
 											hx-target={ props.Target() }
 											if props.HxPushURL {
 												hx-push-url="true"
@@ -117,8 +124,8 @@ templ List(props ListProps) {
 				<div class={ props.Classes.PaginationNav }>
 					if props.Page > 1 {
 						<a
-							href={ templ.SafeURL(PageURL(props.BaseURL, 1)) }
-							hx-get={ PageURL(props.BaseURL, 1) }
+							href={ templ.SafeURL(PageURL(props.StateURL(), 1)) }
+							hx-get={ PageURL(props.StateURL(), 1) }
 							hx-target={ props.Target() }
 							if props.HxPushURL {
 								hx-push-url="true"
@@ -130,8 +137,8 @@ templ List(props ListProps) {
 					}
 					if props.Page > 1 {
 						<a
-							href={ templ.SafeURL(PageURL(props.BaseURL, props.Page-1)) }
-							hx-get={ PageURL(props.BaseURL, props.Page-1) }
+							href={ templ.SafeURL(PageURL(props.StateURL(), props.Page-1)) }
+							hx-get={ PageURL(props.StateURL(), props.Page-1) }
 							hx-target={ props.Target() }
 							if props.HxPushURL {
 								hx-push-url="true"
@@ -144,8 +151,8 @@ templ List(props ListProps) {
 					<span class={ props.Classes.PageIndicator }>{ strconv.Itoa(props.Page) } / { strconv.Itoa(props.TotalPages) }</span>
 					if props.Page < props.TotalPages {
 						<a
-							href={ templ.SafeURL(PageURL(props.BaseURL, props.Page+1)) }
-							hx-get={ PageURL(props.BaseURL, props.Page+1) }
+							href={ templ.SafeURL(PageURL(props.StateURL(), props.Page+1)) }
+							hx-get={ PageURL(props.StateURL(), props.Page+1) }
 							hx-target={ props.Target() }
 							if props.HxPushURL {
 								hx-push-url="true"
@@ -157,8 +164,8 @@ templ List(props ListProps) {
 					}
 					if props.Page < props.TotalPages {
 						<a
-							href={ templ.SafeURL(PageURL(props.BaseURL, props.TotalPages)) }
-							hx-get={ PageURL(props.BaseURL, props.TotalPages) }
+							href={ templ.SafeURL(PageURL(props.StateURL(), props.TotalPages)) }
+							hx-get={ PageURL(props.StateURL(), props.TotalPages) }
 							hx-target={ props.Target() }
 							if props.HxPushURL {
 								hx-push-url="true"
@@ -173,7 +180,7 @@ templ List(props ListProps) {
 					<label class={ props.Classes.PageSizeLabel }>Show:</label>
 					<select
 						class={ props.Classes.PageSizeSelect }
-						hx-get={ props.BaseURL }
+						hx-get={ props.PageSizeBaseURL() }
 						hx-target={ props.Target() }
 						if props.HxPushURL {
 							hx-push-url="true"

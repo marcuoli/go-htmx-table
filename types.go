@@ -222,6 +222,48 @@ func (p ListProps) EffectiveTableID() string {
 	return "data-table"
 }
 
+// StateURL returns the base URL with current search, sort, and page_size
+// preserved as query params. SortURL/PageURL can further override specific
+// params because they use q.Set which replaces existing values.
+func (p ListProps) StateURL() string {
+	u, err := url.Parse(p.BaseURL)
+	if err != nil {
+		return p.BaseURL
+	}
+	q := u.Query()
+	if p.Search != "" {
+		q.Set(p.EffectiveSearchName(), p.Search)
+	}
+	if p.SortBy != "" {
+		q.Set("sort_by", p.SortBy)
+		q.Set("sort_dir", p.SortDir)
+	}
+	if p.PageSize > 0 {
+		q.Set("page_size", strconv.Itoa(p.PageSize))
+	}
+	u.RawQuery = q.Encode()
+	return u.String()
+}
+
+// PageSizeBaseURL returns the base URL with search and sort preserved but
+// without page_size (the page-size select adds its own value).
+func (p ListProps) PageSizeBaseURL() string {
+	u, err := url.Parse(p.BaseURL)
+	if err != nil {
+		return p.BaseURL
+	}
+	q := u.Query()
+	if p.Search != "" {
+		q.Set(p.EffectiveSearchName(), p.Search)
+	}
+	if p.SortBy != "" {
+		q.Set("sort_by", p.SortBy)
+		q.Set("sort_dir", p.SortDir)
+	}
+	u.RawQuery = q.Encode()
+	return u.String()
+}
+
 // ---------------------------------------------------------------------------
 // Badge props
 // ---------------------------------------------------------------------------
