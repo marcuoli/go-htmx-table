@@ -175,28 +175,30 @@ type ListClasses struct {
 
 // ListProps configures the high-level List component.
 type ListProps struct {
-	TableID            string
-	BodyID             string
-	Columns            []ListColumn
-	SortBy             string
-	SortDir            string
-	BaseURL            string
-	Page               int
-	PageSize           int
-	TotalPages         int
-	TotalItems         int
-	PageSizes          []int
-	Search             string
-	SearchName         string
-	SearchPlaceholder  string
-	SearchEnabled      bool
-	HasRows            bool
-	EmptyMessage       string
-	HxTarget           string
-	HxPushURL          bool
-	RefreshTrigger     string
-	RefreshURL         string
-	Classes            ListClasses
+	TableID              string
+	BodyID               string
+	Columns              []ListColumn
+	SortBy               string
+	SortDir              string
+	BaseURL              string
+	Page                 int
+	PageSize             int
+	PageSizeExplicit     bool
+	TotalPages           int
+	TotalItems           int
+	PageSizes            []int
+	Search               string
+	SearchName           string
+	SearchPlaceholder    string
+	SearchEnabled        bool
+	AlwaysShowPagination bool
+	HasRows              bool
+	EmptyMessage         string
+	HxTarget             string
+	HxPushURL            bool
+	RefreshTrigger       string
+	RefreshURL           string
+	Classes              ListClasses
 }
 
 // Target returns the HTMX target, defaulting to "#content".
@@ -231,6 +233,11 @@ func (p ListProps) EffectiveTableID() string {
 	return "data-table"
 }
 
+// ShouldShowPagination returns true when the pagination/footer controls should render.
+func (p ListProps) ShouldShowPagination() bool {
+	return p.TotalPages > 1 || (p.AlwaysShowPagination && p.TotalItems > 0)
+}
+
 // StateURL returns the base URL with current search, sort, and page_size
 // preserved as query params. SortURL/PageURL can further override specific
 // params because they use q.Set which replaces existing values.
@@ -247,7 +254,7 @@ func (p ListProps) StateURL() string {
 		q.Set("sort_by", p.SortBy)
 		q.Set("sort_dir", p.SortDir)
 	}
-	if p.PageSize > 0 {
+	if p.PageSizeExplicit && p.PageSize > 0 {
 		q.Set("page_size", strconv.Itoa(p.PageSize))
 	}
 	u.RawQuery = q.Encode()
