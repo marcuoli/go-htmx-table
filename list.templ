@@ -5,6 +5,11 @@ import "strconv"
 // List renders filter, table, and pagination in a single call.
 templ List(props ListProps) {
 	<div
+		data-auto-page-size="resolution"
+		data-current-page-size={ strconv.Itoa(props.PageSize) }
+		data-page-size-full-hd="10"
+		data-page-size-quad-hd="15"
+		data-page-size-4k="20"
 		if props.RefreshURL != "" {
 			hx-get={ props.RefreshURL }
 			hx-trigger={ props.RefreshTrigger }
@@ -38,7 +43,7 @@ templ List(props ListProps) {
 						<input type="hidden" name="sort_by" value={ props.SortBy }/>
 						<input type="hidden" name="sort_dir" value={ props.SortDir }/>
 					}
-					if props.PageSize > 0 {
+					if props.PageSizeExplicit && props.PageSize > 0 {
 						<input type="hidden" name="page_size" value={ strconv.Itoa(props.PageSize) }/>
 					}
 				</form>
@@ -116,7 +121,7 @@ templ List(props ListProps) {
 			</table>
 		</div>
 
-		if props.TotalPages > 1 {
+		if props.ShouldShowPagination() {
 			<div class={ props.Classes.Pagination }>
 				<div class={ props.Classes.PaginationInfo }>
 					{ PaginationInfo(props.Page, props.PageSize, props.TotalItems) }

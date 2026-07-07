@@ -64,6 +64,20 @@ func TestPageURL(t *testing.T) {
 	}
 }
 
+func TestListProps_StateURL_OmitsSessionDerivedPageSize(t *testing.T) {
+	p := ListProps{BaseURL: "/items", PageSize: 15, Search: "abc"}
+	if got := p.StateURL(); got != "/items?search=abc" {
+		t.Errorf("StateURL() = %q; want no page_size", got)
+	}
+}
+
+func TestListProps_StateURL_PreservesExplicitPageSize(t *testing.T) {
+	p := ListProps{BaseURL: "/items", PageSize: 50, PageSizeExplicit: true, Search: "abc"}
+	if got := p.StateURL(); got != "/items?page_size=50&search=abc" {
+		t.Errorf("StateURL() = %q; want explicit page_size", got)
+	}
+}
+
 func TestPageSizeURL(t *testing.T) {
 	u := PageSizeURL("/items?page=3", 50)
 	// Should set page_size and remove page
@@ -157,5 +171,26 @@ func TestPageSizes_Custom(t *testing.T) {
 	got := pageSizes(custom)
 	if len(got) != 2 || got[0] != 5 {
 		t.Errorf("pageSizes(custom) = %v; want [5,15]", got)
+	}
+}
+
+func TestListProps_ShouldShowPagination(t *testing.T) {
+	tests := []struct {
+		name  string
+		props ListProps
+		want  bool
+	}{
+		{name: "multiple pages", props: ListProps{TotalPages: 2, TotalItems: 25}, want: true},
+		{name: "single page default hidden", props: ListProps{TotalPages: 1, TotalItems: 10}, want: false},
+		{name: "single page opt in", props: ListProps{TotalPages: 1, TotalItems: 10, AlwaysShowPagination: true}, want: true},
+		{name: "empty opt in hidden", props: ListProps{TotalPages: 0, TotalItems: 0, AlwaysShowPagination: true}, want: false},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			if got := tc.props.ShouldShowPagination(); got != tc.want {
+				t.Errorf("ShouldShowPagination() = %v; want %v", got, tc.want)
+			}
+		})
 	}
 }
