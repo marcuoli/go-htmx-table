@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Use official go-versioning v0.1.1 to plan module tags and full version/date/PR build text, using explicit commit metadata.
+
 ## v0.2.0
 
 - Publish the previously merged table, list, query-state and caller-style updates.

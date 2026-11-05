@@ -2,7 +2,10 @@ module github.com/marcuoli/go-htmx-table
 
 go 1.27.3
 
-require github.com/a-h/templ v0.3.1100
+require (
+	github.com/a-h/templ v0.3.1100
+	github.com/marcuoli/go-versioning v0.1.1
+)
 
 require (
 	github.com/a-h/parse v0.0.0-20250122154542-74294addb73e // indirect
