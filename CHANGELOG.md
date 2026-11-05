@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Adopt official go-versioning VERSION/baseline support for explicit release-tool builds, with shared metadata injection and a read-only build-info query.
+
 ## 0.2.1+20261105.15
 
 - Use official go-versioning v0.1.1 to plan module tags and full version/date/PR build text, using explicit commit metadata.

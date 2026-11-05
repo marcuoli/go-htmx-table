@@ -79,3 +79,24 @@ func TestCommitIdentity(t *testing.T) {
 		t.Fatalf("commit-local date: %q", result.Version)
 	}
 }
+
+func TestBuildInfoIsReadOnlyAndSeparateFromPlanning(t *testing.T) {
+	var output bytes.Buffer
+	if err := run([]string{"-build-info"}, &output); err != nil {
+		t.Fatal(err)
+	}
+	var info struct {
+		Version            string `json:"version"`
+		OverallBuildNumber uint64 `json:"overall_build_number"`
+	}
+	if err := json.Unmarshal(output.Bytes(), &info); err != nil {
+		t.Fatal(err)
+	}
+	if info.Version == "" || info.OverallBuildNumber != 0 {
+		t.Fatalf("unallocated test binary has unexpected metadata: %+v", info)
+	}
+	output.Reset()
+	if err := run([]string{"-build-info", "-pr", "15"}, &output); err == nil || output.Len() != 0 {
+		t.Fatal("build-info accepted planning flags")
+	}
+}
