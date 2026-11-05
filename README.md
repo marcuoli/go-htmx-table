@@ -271,6 +271,14 @@ updates. `module-version -build-info` reads that metadata without Git/store acce
 The output path and allocation/compiler logs are retained under external storage.
 An ordinary `go build` bypasses this project workflow and has no known counter.
 
+The wrapper builds a source snapshot. For a release artifact, first verify the
+merged PR and its full tag, then use the pinned CLI's `build --release --version
+FULL_VERSION --branch main` with the same explicit repository, live authority,
+application ID and fresh request. Inject its `--format ldflags` into the one
+logical compilation and verify `-build-info` against the allocation. Preserve
+the actual build time, counter ID and reservation; never relabel a snapshot
+binary as a release or reuse an earlier compile's request ID.
+
 Initialize the authority separately, once, after investigating legacy counters:
 
 ```sh
