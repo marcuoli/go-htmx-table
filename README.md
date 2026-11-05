@@ -202,11 +202,29 @@ type FilterOption struct {
 
 ## Requirements
 
-- Go 1.26+
-- [templ](https://templ.guide) v0.3+
+- Go 1.27.3+
+- [templ](https://templ.guide) v0.3.1100 (matching generated code)
 - Tailwind CSS 4
 - HTMX 2.x
 - Alpine.js (for filter auto-submit)
+
+## Development
+
+The templ generator and runtime are pinned together in go.mod:
+
+```sh
+go tool templ generate
+go test ./...
+go vet ./...
+go mod verify
+```
+
+The new generated code requires templ v0.3.1100; older runtimes lack its
+attribute-rendering APIs. All dependencies use official upstream sources.
+The parse module retains v0.0.0-20250122154542-74294addb73e because the newer
+v0.0.0-20261027111828-db2689052003 adds Parser.Match, which templ v0.3.1100's
+utf8RuneParser does not implement. Recheck this upstream compatibility exception
+on the next dependency review; see issue #12. No dependency source is patched.
 
 ## License
 
