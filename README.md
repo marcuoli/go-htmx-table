@@ -15,8 +15,12 @@ A reusable [templ](https://templ.guide)-based table component system for Go web 
 ## Installation
 
 ```bash
-go get github.com/marcuoli/go-htmx-table@latest
+go get github.com/marcuoli/go-htmx-table@v0.2.1+20261105.15
 ```
+
+Use the complete `vCORE+YYYYMMDD.PR` tag from the release. Go may record a
+pseudo-version for that exact revision; `@latest` may select an older conventional
+tag. Verify the resolved commit against the release rather than shortening its identity.
 
 ## Quick Start
 
@@ -225,6 +229,30 @@ The parse module retains v0.0.0-20250122154542-74294addb73e because the newer
 v0.0.0-20261027111828-db2689052003 adds Parser.Match, which templ v0.3.1100's
 utf8RuneParser does not implement. Recheck this upstream compatibility exception
 on the next dependency review; see issue #12. No dependency source is patched.
+
+### Module version planning
+
+Use [go-versioning](https://github.com/marcuoli/go-versioning) v0.1.1 to plan
+full release identities:
+
+```sh
+go run ./scripts/module-version -previous v0.2.0 -bump patch -check v0.2.1+20261105.14 -commit-time 2026-11-05T12:00:00Z -pr 14
+```
+
+This illustrative plan emits release tag `v0.2.1+20261105.14` and full version text
+`0.2.1+20261105.14`, matching OraScope's version/date/PR format. Supply the
+actual target commit timestamp and merged PR number for a real build.
+`go-versioning.Next` selects the date in `America/Sao_Paulo`; the planner
+never invents missing commit metadata or uses the execution date.
+
+The command uses `versioning.ParseCore` and `versioning.Next`, emits a JSON plan,
+and accepts a full previous release tag or a legacy conventional module tag.
+It rejects snapshot predecessors and mismatched expected tags. Choose
+`inherit`, `major`, `minor`, or `patch` according to the change. It does not create tags
+or publish releases. No bare-core alias is created. The JSON
+`version` field provides the full table build text for release tooling. It is
+not a lookup of the consuming executable's version. Validate releases with `GOWORK=off`
+and the published dependency, without local replacements.
 
 ## License
 
