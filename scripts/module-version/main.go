@@ -30,6 +30,7 @@ func run(args []string, output io.Writer) error {
 	expected := flags.String("check", "", "optional expected full release tag")
 	commitTime := flags.String("commit-time", "", "target commit timestamp in RFC3339 format")
 	pr := flags.Uint64("pr", 0, "merged pull-request number")
+	buildInfo := flags.Bool("build-info", false, "print this tool's embedded build metadata without allocation")
 	if err := flags.Parse(args); err != nil {
 		if errors.Is(err, flag.ErrHelp) {
 			_, err := fmt.Fprintln(output, "Usage: module-version -previous TAG -bump inherit|major|minor|patch -commit-time RFC3339 -pr NUMBER [-check FULL_TAG]")
@@ -39,6 +40,16 @@ func run(args []string, output io.Writer) error {
 	}
 	if flags.NArg() != 0 {
 		return fmt.Errorf("positional arguments are not accepted")
+	}
+	if *buildInfo {
+		if flags.NFlag() != 1 {
+			return fmt.Errorf("-build-info cannot be combined with planning flags")
+		}
+		info, err := versioning.CurrentBuild()
+		if err != nil {
+			return err
+		}
+		return json.NewEncoder(output).Encode(info)
 	}
 	if !strings.HasPrefix(*previous, "v") {
 		return fmt.Errorf("-previous must be a v-prefixed release tag")

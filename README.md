@@ -232,7 +232,8 @@ on the next dependency review; see issue #12. No dependency source is patched.
 
 ### Module version planning
 
-Use [go-versioning](https://github.com/marcuoli/go-versioning) v0.1.1 to plan
+Use [go-versioning](https://github.com/marcuoli/go-versioning) release
+`0.3.0+20261105.9` (Go coordinate `v0.3.1-0.20261105212739-db72d5637162`) to plan
 full release identities:
 
 ```sh
@@ -253,6 +254,40 @@ or publish releases. No bare-core alias is created. The JSON
 `version` field provides the full table build text for release tooling. It is
 not a lookup of the consuming executable's version. Validate releases with `GOWORK=off`
 and the published dependency, without local replacements.
+
+### Explicit tool builds and overall build numbers
+
+The library never allocates a counter during imports, consumer compilation,
+startup, tests or planning queries. The explicit project-owned tool build is:
+
+```powershell
+./scripts/build-module-version.ps1 -StorageRoot /absolute/project-storage -Store /absolute/live-authority
+```
+
+Use absolute external paths and PowerShell 7. One fresh request is persisted per
+invocation before allocation; a failed compile consumes its reservation. The
+pinned shared CLI injects metadata and owns all parsing, locking and journal
+updates. `module-version -build-info` reads that metadata without Git/store access.
+The output path and allocation/compiler logs are retained under external storage.
+An ordinary `go build` bypasses this project workflow and has no known counter.
+
+Initialize the authority separately, once, after investigating legacy counters:
+
+```sh
+go tool go-versioning counter-init --repo /absolute/canonical-source --store /absolute/live-authority --app go-htmx-table --seed-commits --branch main --evidence "retained investigation of history, version files, scripts and hooks found no prior counter" --json
+go tool go-versioning counter-status --repo /absolute/canonical-source --store /absolute/live-authority --app go-htmx-table --json
+```
+
+The parent must exist and the new authority leaf must not. The seed is the unique
+commit count at canonical HEAD in complete history, used once; it does not count
+historical build attempts. If an earlier counter exists, preserve its continuity
+using the supported shared migration API instead. `VERSION` is exactly one decimal
+value plus LF inside that live authority; it is separate from the full release
+identity. Never edit/reset it or clone an authority. Cooperating local/CI builders
+must use the same live store; independent or cloud-synced stores cannot claim one
+global order. Missing/corrupt state fails closed. Upgrade all builders before
+migration, preserve receipts, and use a new request for every new compilation.
+See [the released counter contract](https://github.com/marcuoli/go-versioning/blob/v0.3.0%2B20261105.9/docs/build-counters.md).
 
 ## License
 

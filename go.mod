@@ -4,7 +4,7 @@ go 1.27.3
 
 require (
 	github.com/a-h/templ v0.3.1100
-	github.com/marcuoli/go-versioning v0.1.1
+	github.com/marcuoli/go-versioning v0.3.1-0.20261105212739-db72d5637162
 )
 
 require (
@@ -27,4 +27,7 @@ require (
 	golang.org/x/tools v0.52.0 // indirect
 )
 
-tool github.com/a-h/templ/cmd/templ
+tool (
+	github.com/a-h/templ/cmd/templ
+	github.com/marcuoli/go-versioning/cmd/go-versioning
+)
