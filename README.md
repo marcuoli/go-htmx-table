@@ -15,7 +15,7 @@ A reusable [templ](https://templ.guide)-based table component system for Go web 
 ## Installation
 
 ```bash
-go get github.com/marcuoli/go-htmx-table@v0.2.1+20261105.19
+go get github.com/marcuoli/go-htmx-table@v0.2.1+20261106.21
 ```
 
 Use the complete `vCORE+YYYYMMDD.PR` tag from the release. Go may record a

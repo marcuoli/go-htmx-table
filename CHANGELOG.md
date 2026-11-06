@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.2.1+20261106.21
 
 - Bind numeric VERSION and its ownership record to permanent canonical main through official shared location validation; keep journals and receipts external, with location-only migration preserving all earlier build attempts.
 - Pin the corrected go-versioning release and gate explicit snapshot/release artifact builds through the shared counter-check command.
