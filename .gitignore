@@ -1,0 +1,3 @@
+# Mutable shared counter state belongs only in permanent primary main.
+/VERSION
+/VERSION.authority.json

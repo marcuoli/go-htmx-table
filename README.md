@@ -233,7 +233,7 @@ on the next dependency review; see issue #12. No dependency source is patched.
 ### Module version planning
 
 Use [go-versioning](https://github.com/marcuoli/go-versioning) release
-`0.3.0+20261105.9` (Go coordinate `v0.3.1-0.20261105212739-db72d5637162`) to plan
+`0.3.1+20261106.13` (Go coordinate `v0.3.2-0.20261106100520-4c3c478eb827`) to plan
 full release identities:
 
 ```sh
@@ -261,41 +261,57 @@ The library never allocates a counter during imports, consumer compilation,
 startup, tests or planning queries. The explicit project-owned tool build is:
 
 ```powershell
-./scripts/build-module-version.ps1 -StorageRoot /absolute/project-storage -Store /absolute/live-authority
+./scripts/build-module-version.ps1 -StorageRoot /absolute/project-storage -Store /absolute/live-authority -MainRepository /absolute/permanent-main
 ```
 
 Use absolute external paths and PowerShell 7. One fresh request is persisted per
 invocation before allocation; a failed compile consumes its reservation. The
-pinned shared CLI injects metadata and owns all parsing, locking and journal
+pinned shared CLI validates the main VERSION location/ownership before any
+reservation, injects metadata and owns all parsing, locking and journal
 updates. `module-version -build-info` reads that metadata without Git/store access.
 The output path and allocation/compiler logs are retained under external storage.
 An ordinary `go build` bypasses this project workflow and has no known counter.
 
-The wrapper builds a source snapshot. For a release artifact, first verify the
-merged PR and its full tag, then use the pinned CLI's `build --release --version
-FULL_VERSION --branch main` with the same explicit repository, live authority,
-application ID and fresh request. Inject its `--format ldflags` into the one
-logical compilation and verify `-build-info` against the allocation. Preserve
+The wrapper builds a source snapshot by default. For a release artifact, first
+verify the merged PR and its full tag, then pass `-ReleaseVersion FULL_VERSION`
+to that same wrapper. The pinned CLI verifies release cleanliness/tag identity
+and injects its shared linker flags into the one logical compilation. Verify
+`-build-info` against the allocation. Preserve
 the actual build time, counter ID and reservation; never relabel a snapshot
 binary as a release or reuse an earlier compile's request ID.
 
-Initialize the authority separately, once, after investigating legacy counters:
+Existing authorities use the official location-only correction after all builders
+are upgraded and primary-main ignore rules are reviewed and integrated:
 
 ```sh
-go tool go-versioning counter-init --repo /absolute/canonical-source --store /absolute/live-authority --app go-htmx-table --seed-commits --branch main --evidence "retained investigation of history, version files, scripts and hooks found no prior counter" --json
-go tool go-versioning counter-status --repo /absolute/canonical-source --store /absolute/live-authority --app go-htmx-table --json
+go tool go-versioning counter-status --repo /absolute/source --main-repo /absolute/permanent-main --store /absolute/live-authority --app go-htmx-table --json
+go tool go-versioning counter-check --repo /absolute/source --main-repo /absolute/permanent-main --store /absolute/live-authority --app go-htmx-table --json
+# Only the expected legacy-layout diagnostic proceeds to relocation:
+go tool go-versioning counter-relocate --repo /absolute/source --main-repo /absolute/permanent-main --store /absolute/live-authority --app go-htmx-table --json
+go tool go-versioning counter-check --repo /absolute/source --main-repo /absolute/permanent-main --store /absolute/live-authority --app go-htmx-table --json
 ```
 
-The parent must exist and the new authority leaf must not. The seed is the unique
-commit count at canonical HEAD in complete history, used once; it does not count
-historical build attempts. If an earlier counter exists, preserve its continuity
-using the supported shared migration API instead. `VERSION` is exactly one decimal
-value plus LF inside that live authority; it is separate from the full release
-identity. Never edit/reset it or clone an authority. Cooperating local/CI builders
-must use the same live store; independent or cloud-synced stores cannot claim one
-global order. Missing/corrupt state fails closed. Upgrade all builders before
-migration, preserve receipts, and use a new request for every new compilation.
-See [the released counter contract](https://github.com/marcuoli/go-versioning/blob/v0.3.0%2B20261105.9/docs/build-counters.md).
+Relocation creates missing root files at the existing number without allocating,
+reseeding or changing identity/receipts. Other corruption/ownership/I/O failures
+require investigation, never generic repair. A genuinely new authority uses the
+official explicit-main initialization API only after the legacy-sequence inquiry;
+the one-time complete canonical commit count is a fallback when no prior method
+exists. Existing table state must never be initialized again.
+
+`VERSION` is one decimal value plus LF at permanent primary main, beside
+`VERSION.authority.json`. Both are untracked and ignored by reviewed root rules;
+full release identity stays separate. Journals/locks/receipts remain in the same
+external authority. Retired store VERSION evidence is preserved by the shared
+migration, not used as an active counter. Never hand-edit, copy, reset or clone
+these files or create per-worktree counters. Tests of allocation/migration require
+a standalone isolated Git main fixture, never a linked worktree of live source.
+
+All local/WSL/CI builders must reach the same actual main files and journal on the
+allocation host and pass shared validation. No WSL/CI allocation entry point is
+configured here; qualify that access before adding one. A runner clone, cloud-sync
+copy or guessed mount alias cannot stand in for the real main. Old shared writers
+refuse the relocated schema. Runtime/build-info/planning remain read-only.
+See [the released location contract](https://github.com/marcuoli/go-versioning/blob/v0.3.1%2B20261106.13/docs/counter-location.md).
 
 ## License
 
