@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.2.1+20261106.21
+
+- Bind numeric VERSION and its ownership record to permanent canonical main through official shared location validation; keep journals and receipts external, with location-only migration preserving all earlier build attempts.
+- Pin the corrected go-versioning release and gate explicit snapshot/release artifact builds through the shared counter-check command.
+
 ## 0.2.1+20261105.19
 
 - Adopt official go-versioning VERSION/baseline support for explicit release-tool builds, with shared metadata injection and a read-only build-info query.

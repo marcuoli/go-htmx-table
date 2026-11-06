@@ -2,13 +2,16 @@
 [CmdletBinding()]
 param(
     [Parameter(Mandatory)][string]$StorageRoot,
-    [Parameter(Mandatory)][string]$Store
+    [Parameter(Mandatory)][string]$Store,
+    [Parameter(Mandatory)][string]$MainRepository,
+    [string]$ReleaseVersion
 )
 
 $ErrorActionPreference = 'Stop'
 $sourceRoot = Split-Path -Parent $PSScriptRoot
-if (![IO.Path]::IsPathFullyQualified($StorageRoot) -or ![IO.Path]::IsPathFullyQualified($Store)) {
-    throw 'StorageRoot and Store must be absolute external paths.'
+if (![IO.Path]::IsPathFullyQualified($StorageRoot) -or ![IO.Path]::IsPathFullyQualified($Store) -or
+    ![IO.Path]::IsPathFullyQualified($MainRepository)) {
+    throw 'StorageRoot, Store and MainRepository must be absolute paths.'
 }
 $sourcePrefix = [IO.Path]::GetFullPath($sourceRoot).TrimEnd('\', '/') + [IO.Path]::DirectorySeparatorChar
 foreach ($externalPath in @($StorageRoot, $Store)) {
@@ -41,10 +44,16 @@ try {
     foreach ($directory in @($attemptPath, $scratch, $env:GOTMPDIR, $env:GOCACHE, $env:GOMODCACHE)) {
         New-Item -ItemType Directory -Path $directory -Force | Out-Null
     }
-    [ordered]@{ request_id = $requestID; app = 'go-htmx-table'; repo = $sourceRoot; store = $Store } |
+    # Shared validation owns primary-main selection, ignored operational files,
+    # authority ownership and receipt history. Never allocate on a failed gate.
+    $locationArgs = @('--repo', $sourceRoot, '--main-repo', $MainRepository, '--store', $Store, '--app', 'go-htmx-table')
+    & go tool go-versioning counter-check @locationArgs --json > (Join-Path $attemptPath 'counter-check.json')
+    if ($LASTEXITCODE -ne 0) { throw "Counter location validation failed; no build allocation attempted. Evidence: $attemptPath" }
+    [ordered]@{ request_id = $requestID; app = 'go-htmx-table'; repo = $sourceRoot; main_repo = $MainRepository; store = $Store; release_version = $ReleaseVersion } |
         ConvertTo-Json | Set-Content -LiteralPath (Join-Path $attemptPath 'request.json')
 
-    $sharedArgs = @('--repo', $sourceRoot, '--store', $Store, '--app', 'go-htmx-table', '--request-id', $requestID)
+    $sharedArgs = $locationArgs + @('--request-id', $requestID)
+    if ($ReleaseVersion) { $sharedArgs += @('--release', '--version', $ReleaseVersion, '--branch', 'main') }
     $allocation = & go tool go-versioning build @sharedArgs --json 2> (Join-Path $attemptPath 'allocation-errors.log')
     if ($LASTEXITCODE -ne 0) { throw "Allocation failed; inspect $attemptPath before retrying the recorded request." }
     $allocation | Set-Content -LiteralPath (Join-Path $attemptPath 'allocation.json')
