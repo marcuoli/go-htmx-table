@@ -207,7 +207,8 @@ type FilterOption struct {
 ## Requirements
 
 - Go 1.27.3+
-- [templ](https://templ.guide) v0.3.1100 (matching generated code)
+- Go 1.27.4 selected by the module's toolchain directive for development/builds
+- [templ](https://templ.guide) v0.3.1118 (matching generated code)
 - Tailwind CSS 4
 - HTMX 2.x
 - Alpine.js (for filter auto-submit)
@@ -223,12 +224,18 @@ go vet ./...
 go mod verify
 ```
 
-The new generated code requires templ v0.3.1100; older runtimes lack its
-attribute-rendering APIs. All dependencies use official upstream sources.
-The parse module retains v0.0.0-20250122154542-74294addb73e because the newer
-v0.0.0-20261027111828-db2689052003 adds Parser.Match, which templ v0.3.1100's
-utf8RuneParser does not implement. Recheck this upstream compatibility exception
-on the next dependency review; see issue #12. No dependency source is patched.
+The generator and runtime use templ v0.3.1118 with official parse v0.0.42.
+This combination compiles and regenerates the templates, removing the previous
+Parser.Match compatibility hold from issue #12. All dependencies use official
+upstream sources; no dependency source is patched.
+
+Transitive major paths remain those imported by upstream packages: templ uses
+Backoff v4 and YAML v3; Go tools' graph contains Goldmark v1. Their newer majors
+cannot replace these imports without upstream adoption. Graph-only requirements
+not needed by this module's packages/tools are controlled by upstream manifests;
+`go mod tidy` removes artificial direct pins. Go telemetry has no stable release
+tag, so its upstream-selected pseudo-version is retained. See issue #22 for the
+full version, major-path and advisory review.
 
 ### Module version planning
 
