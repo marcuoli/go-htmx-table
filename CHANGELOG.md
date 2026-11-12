@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- Select Go 1.27.4 while retaining the Go 1.27.3 consumer minimum.
+- Upgrade templ to v0.3.1118 and regenerate its matching first-party sources; adopt stable parse v0.0.42 and remove the prior parsing compatibility hold.
+- Refresh compatible Brotli and Go module/sync/sys dependencies; document upstream-owned major paths and graph-only constraints in issue #22.
+
 ## 0.2.1+20261106.21
 
 - Bind numeric VERSION and its ownership record to permanent canonical main through official shared location validation; keep journals and receipts external, with location-only migration preserving all earlier build attempts.
