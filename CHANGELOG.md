@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Reset page-size controls to page one without retaining stale page sizes, while preserving search, sort and other query parameters.
+- Prevent integer overflow in SQL offsets and displayed pagination ranges without changing exported function signatures.
+- Correct the FilterCard Quick Start and strengthen query-state, rendering and build-wrapper preflight regressions.
 - Select Go 1.27.4 while retaining the Go 1.27.3 consumer minimum.
 - Upgrade templ to v0.3.1118 and regenerate its matching first-party sources; adopt stable parse v0.0.42 and remove the prior parsing compatibility hold.
 - Refresh compatible Brotli and Go module/sync/sys dependencies; document upstream-owned major paths and graph-only constraints in issue #22.

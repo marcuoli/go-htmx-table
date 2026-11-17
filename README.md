@@ -66,7 +66,7 @@ import table "github.com/marcuoli/go-htmx-table"
 
 templ CustomerTable(props table.DataTableProps, customers []Customer) {
     // Filter bar
-    @table.FilterCard("/customer") {
+    @table.FilterCard(table.FilterCardProps{Action: "/customer"}) {
         @table.SearchInput("q", "Search customers...", "")
     }
 
@@ -132,7 +132,7 @@ templ CustomerTable(props table.DataTableProps, customers []Customer) {
 
 | Component | Description |
 |---|---|
-| `FilterCard(action)` | Filter form wrapper with auto-submit |
+| `FilterCard(props)` | Filter form wrapper configured by `FilterCardProps` |
 | `SearchInput(name, placeholder, value)` | Debounced search field |
 | `FilterSelect(name, label, selected, options)` | Dropdown filter |
 
@@ -193,6 +193,11 @@ type FilterOption struct {
 | `BuildOrderClause(field, dir)` | Returns `"field ASC/DESC"` |
 | `TotalPages(total, pageSize)` | Calculates page count |
 | `Offset(page, pageSize)` | Calculates SQL offset |
+
+`Offset` preserves its `int` return type: nonpositive page sizes return zero,
+and offsets exceeding the platform's integer range saturate at `math.MaxInt`.
+Applications should still clamp requested pages against their actual result count.
+`PaginationInfo` clamps its displayed page against the supplied item total.
 
 ## URL Helpers (root package)
 

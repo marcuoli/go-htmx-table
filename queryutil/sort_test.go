@@ -1,8 +1,10 @@
 package queryutil
 
 import (
+	"math"
 	"net/http"
 	"net/http/httptest"
+	"strconv"
 	"testing"
 )
 
@@ -122,11 +124,27 @@ func TestOffset(t *testing.T) {
 		{1, 10, 0},
 		{3, 10, 20},
 		{0, 10, 0}, // clamps to page 1
+		{math.MinInt, 10, 0},
+		{2, 0, 0},
+		{2, -10, 0},
+		{math.MaxInt, 1, math.MaxInt - 1},
+		{math.MaxInt/2 + 1, 2, math.MaxInt - 1},
+		{math.MaxInt/2 + 2, 2, math.MaxInt},
+		{math.MaxInt, 2, math.MaxInt},
 	}
 	for _, tc := range tests {
 		got := Offset(tc.page, tc.size)
 		if got != tc.want {
 			t.Errorf("Offset(%d, %d) = %d; want %d", tc.page, tc.size, got, tc.want)
 		}
+	}
+}
+
+func TestOffset_ParsedPageBounds(t *testing.T) {
+	r := makeRequest("/?page=" + strconv.Itoa(math.MaxInt) + "&page_size=2")
+	page := ParsePage(r)
+	size := ParsePageSize(r, 10, 100)
+	if got := Offset(page, size); got != math.MaxInt {
+		t.Errorf("parsed offset = %d; want saturated %d", got, math.MaxInt)
 	}
 }
