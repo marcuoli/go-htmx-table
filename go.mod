@@ -7,6 +7,7 @@ toolchain go1.27.4
 require (
 	github.com/a-h/templ v0.3.1118
 	github.com/marcuoli/go-versioning v0.3.2-0.20261106100520-4c3c478eb827
+	golang.org/x/net v0.62.0
 )
 
 require (
@@ -22,7 +23,6 @@ require (
 	github.com/xyproto/randomstring v1.2.0 // indirect
 	go.yaml.in/yaml/v3 v3.0.6 // indirect
 	golang.org/x/mod v0.43.0 // indirect
-	golang.org/x/net v0.62.0 // indirect
 	golang.org/x/sync v0.25.0 // indirect
 	golang.org/x/sys v0.50.0 // indirect
 	golang.org/x/tools v0.52.0 // indirect

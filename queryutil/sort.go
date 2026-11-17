@@ -3,6 +3,7 @@
 package queryutil
 
 import (
+	"math"
 	"net/http"
 	"strconv"
 )
@@ -80,9 +81,17 @@ func TotalPages(totalItems, pageSize int) int {
 }
 
 // Offset calculates the SQL OFFSET for a given page and page size.
+// Nonpositive sizes return zero. Offsets above the int range saturate at
+// math.MaxInt so untrusted page numbers cannot wrap into negative SQL offsets.
 func Offset(page, pageSize int) int {
+	if pageSize <= 0 {
+		return 0
+	}
 	if page < 1 {
 		page = 1
+	}
+	if page-1 > math.MaxInt/pageSize {
+		return math.MaxInt
 	}
 	return (page - 1) * pageSize
 }

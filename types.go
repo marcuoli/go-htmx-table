@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"net/url"
 	"strconv"
+
+	"github.com/marcuoli/go-htmx-table/queryutil"
 )
 
 // ---------------------------------------------------------------------------
@@ -261,23 +263,10 @@ func (p ListProps) StateURL() string {
 	return u.String()
 }
 
-// PageSizeBaseURL returns the base URL with search and sort preserved but
-// without page_size (the page-size select adds its own value).
+// PageSizeBaseURL preserves query state but removes page and page_size.
+// The page-size select supplies its own value and starts at the first page.
 func (p ListProps) PageSizeBaseURL() string {
-	u, err := url.Parse(p.BaseURL)
-	if err != nil {
-		return p.BaseURL
-	}
-	q := u.Query()
-	if p.Search != "" {
-		q.Set(p.EffectiveSearchName(), p.Search)
-	}
-	if p.SortBy != "" {
-		q.Set("sort_by", p.SortBy)
-		q.Set("sort_dir", p.SortDir)
-	}
-	u.RawQuery = q.Encode()
-	return u.String()
+	return pageSizeBaseURL(p.StateURL())
 }
 
 // ---------------------------------------------------------------------------
@@ -366,14 +355,14 @@ func SortIcon(field, currentSort, currentDir string) string {
 }
 
 // PaginationInfo returns a human-readable string like "Showing 1–10 of 42 items".
+// It clamps the page to the available range; nonpositive sizes/totals have no items.
 func PaginationInfo(page, pageSize, totalItems int) string {
-	if totalItems == 0 {
+	if totalItems <= 0 || pageSize <= 0 {
 		return "No items"
 	}
-	start := (page-1)*pageSize + 1
-	end := page * pageSize
-	if end > totalItems {
-		end = totalItems
-	}
+	page = min(max(page, 1), queryutil.TotalPages(totalItems, pageSize))
+	offset := queryutil.Offset(page, pageSize)
+	start := offset + 1
+	end := offset + min(pageSize, totalItems-offset)
 	return fmt.Sprintf("Showing %d\u2013%d of %d items", start, end, totalItems)
 }

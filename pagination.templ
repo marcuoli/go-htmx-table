@@ -45,7 +45,7 @@ templ ServerPagination(props PaginationProps) {
 			<label class="text-sm text-gray-700 dark:text-gray-300">Show:</label>
 			<select
 				class="text-sm border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300"
-				hx-get={ props.BaseURL }
+				hx-get={ pageSizeBaseURL(props.BaseURL) }
 				hx-target={ props.Target() }
 				if props.HxPushURL {
 					hx-push-url="true"
