@@ -1,5 +1,8 @@
 # go-htmx-table
 
+[![Go module/build requirement: 1.27.4](https://img.shields.io/badge/Go_module%2Fbuild-1.27.4-blue)](#requirements)
+[![Go source compatibility: 1.27.3](https://img.shields.io/badge/Go_source_compatibility-1.27.3-green)](#source-compatibility)
+
 A reusable [templ](https://templ.guide)-based table component system for Go web applications using **HTMX + Alpine.js + Tailwind CSS**.
 
 ## Features
@@ -211,12 +214,29 @@ Applications should still clamp requested pages against their actual result coun
 
 ## Requirements
 
-- Go 1.27.3+
-- Go 1.27.4 selected by the module's toolchain directive for development/builds
+- **Module/build requirement: Go 1.27.4 or newer.** The canonical `go.mod`
+  declares `go 1.27.4`; builds and release validation use Go 1.27.4. A matching
+  toolchain suggestion would be redundant and is omitted.
 - [templ](https://templ.guide) v0.3.1118 (matching generated code)
 - Tailwind CSS 4
 - HTMX 2.x
 - Alpine.js (for filter auto-submit)
+
+### Source compatibility
+
+**Verified source compatibility: Go 1.27.3**, independently tested on Windows
+amd64 and 386 with CGO disabled. This does **not** lower the unchanged module's
+Go 1.27.4 install/build requirement.
+
+The 2026-11-17 check used a complete isolated source snapshot with only its root
+`go` directive lowered; application/test source, selected dependencies and
+checksums were unchanged. The actual Go 1.27.3 compiler passed tests, vet, module
+verification and a native helper build with `GOTOOLCHAIN=local`. The adjacent
+Go 1.27.2 compiler rejects the selected go-versioning dependency, whose manifest
+requires Go 1.27.3. Mingo v0.18.0, including dependencies and tests, reports the
+Go 1.27 minor-version floor; it does not determine the patch boundary. First-party
+code's `min`/`max` builtins need Go 1.21, while templ requires Go 1.26. No lower
+floor is claimed for other platforms or CGO configurations.
 
 ## Development
 

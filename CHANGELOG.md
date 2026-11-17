@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Align the canonical module/build requirement with current stable Go 1.27.4 and remove its redundant toolchain suggestion.
+- Separately document independently verified source compatibility in README badges/text; refresh the official dependency/tool and major-version audit.
+
+## 0.2.1+20261117.26
+
 - Reset page-size controls to page one without retaining stale page sizes, while preserving search, sort and other query parameters.
 - Prevent integer overflow in SQL offsets and displayed pagination ranges without changing exported function signatures.
 - Correct the FilterCard Quick Start and strengthen query-state, rendering and build-wrapper preflight regressions.
